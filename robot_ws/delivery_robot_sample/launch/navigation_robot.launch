@@ -6,4 +6,5 @@
   <include file="$(find delivery_robot_sample)/launch/img_proc.launch" />  -->
   <include file="$(find delivery_robot_sample)/launch/twugo_method.launch" />
   <include file="$(find delivery_robot_sample)/launch/planner.launch" />
+  <include file="$(find delivery_robot_sample)/launch/slam.launch" />
 </launch>
