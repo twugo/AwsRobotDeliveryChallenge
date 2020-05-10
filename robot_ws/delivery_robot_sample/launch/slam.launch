@@ -3,5 +3,7 @@
     <arg name="slam_methods" value="gmapping"/>
     <!--<arg name="slam_methods" value="karto"/>-->
     <!--<arg name="slam_methods" value="frontier_exploration"/>-->
+
+    <arg name="open_rviz" value="false"/>
   </include>
 </launch>
