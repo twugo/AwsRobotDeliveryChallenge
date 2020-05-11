@@ -32,7 +32,9 @@ class Planner():
         self.__vertex_dict = {} # self.__vertex_dict: vertexのidをキーにvertexを持っている
         self.__vertex_list_param = rospy.get_param("/vertex_list")
         self.__init_graph()  # __vertex_list_param から Vertex と Edge を作成
+        self.__initial_map_data = None
         self.__combined_map_data = None
+        self.__map_resolution = None
 
     def main(self):
         # full_path = self.__calc_all_patterns(start_vertex_id=0)
@@ -42,7 +44,8 @@ class Planner():
         while True:
             if not type(self.__combined_map_data) == type(None):
                 img = np.array(map(lambda x: 255 if x else 0, self.__combined_map_data), dtype='uint8').reshape(self.map_height, self.map_width)
-                rospy.loginfo("[Map CB] img.shape: %s" % str(img.shape))
+                cv2.drawMarker(img, (int(self.map_width/2), int(self.map_height/2)), (200), markerType=cv2.MARKER_CROSS, markerSize=50, thickness=1, line_type=cv2.LINE_8)
+                # rospy.loginfo("[Map CB] img.shape: %s" % str(img.shape))
                 cv2.imshow('image', img)
                 cv2.waitKey(1)
             time.sleep(3/1000)
@@ -60,20 +63,20 @@ class Planner():
         # rospy.loginfo("[Map CB] MetaData: %s" % str(data.header))
         # rospy.loginfo("[Map CB] MetaData: %s" % str(data.info))
         # rospy.loginfo("[Map CB] data: %s" % str(data.data))
-        rospy.loginfo("[Map CB] height: %d, width: %d" % (data.info.height, data.info.width))
+        # rospy.loginfo("[Map CB] height: %d, width: %d" % (data.info.height, data.info.width))
         self.map_height = data.info.height
         self.map_width = data.info.width
-        if type(self.__combined_map_data) == type(None):
-            self.__combined_map_data = np.full(self.map_height*self.map_width, False)
+        self.__map_resolution = data.info.resolution
+        self.__map_origin = data.info.origin.position
+        if type(self.__initial_map_data) == type(None):
+            self.__initial_map_data = np.full(self.map_height*self.map_width, False)
+            self.__combined_map_data = self.__initial_map_data.copy()
         # img_data = np.array(data.data, dtype='uint8').reshape(self.map_height, self.map_width)
         map_data = np.array(map(lambda x: False if x == -1 else True if x == 100 else False, data.data))
         self.__combined_map_data = np.logical_or(self.__combined_map_data, map_data)
         # rospy.loginfo("[Map CB] __combined_map_data: %s" % str(self.__combined_map_data.tolist()))
-
-        # rospy.loginfo("Before Destinations: %s" % [key for key in self.__vertex_dict if self.__vertex_dict[key].get_is_destination()])
-        if "is_destination" in payload and payload["is_destination"]:
-            self.__vertex_dict[payload["vertex_id"]].set_is_destination_false()
-        # rospy.loginfo("After Destinations: %s" % [key for key in self.__vertex_dict if self.__vertex_dict[key].get_is_destination()])
+        rospy.loginfo("[Map CB] __map_resolution: %s" % str(self.__map_resolution))
+        rospy.loginfo("[Map CB] __map_origin: %s" % str(self.__map_origin))
         
     def __send_path(self, full_path):
         position_full_path = []
