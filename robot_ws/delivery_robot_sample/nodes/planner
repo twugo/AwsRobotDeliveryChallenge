@@ -76,7 +76,7 @@ class Planner():
         map_data = np.array(map(lambda x: False if x == -1 else True if x == 100 else False, data.data))
         self.__combined_map_data = np.logical_or(self.__combined_map_data, map_data)
         # rospy.loginfo("[Map CB] __combined_map_data: %s" % str(self.__combined_map_data.tolist()))
-        rospy.loginfo("[Map CB] __map_resolution: %s" % str(self.__map_resolution))
+        rospy.loginfo("[Map CB] __map_resolution: %s[Meter/Pixel]" % str(self.__map_resolution))
         rospy.loginfo("[Map CB] __map_origin: %s" % str(self.__map_origin))
         # rospy.loginfo("Before Destinations: %s" % [key for key in self.__vertex_dict if self.__vertex_dict[key].get_is_destination()])
         if "vertex_id" in payload:
