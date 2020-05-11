@@ -37,10 +37,7 @@ class Planner():
         self.__map_resolution = None
 
     def main(self):
-        # full_path = self.__calc_all_patterns(start_vertex_id=0)
-        # for _ in range(10):
-        #     self.__send_path(full_path)
-        #     time.sleep(2)
+        rate = rospy.Rate(1)  # 1Hz
         while True:
             if not type(self.__combined_map_data) == type(None):
                 img = np.array(map(lambda x: 255 if x else 0, self.__combined_map_data), dtype='uint8').reshape(self.map_height, self.map_width)
@@ -48,9 +45,7 @@ class Planner():
                 # rospy.loginfo("[Map CB] img.shape: %s" % str(img.shape))
                 cv2.imshow('image', img)
                 cv2.waitKey(1)
-            time.sleep(3/1000)
-        
-        rospy.spin()
+            rate.sleep()
 
     def __commander_cb(self, data):
         payload = json.loads(data.data)
